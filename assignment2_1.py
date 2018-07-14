@@ -58,3 +58,4 @@ np_matrix = np.array([[[0.67826139, 0.29380381],
                [0.10820313, 0.49978937],
                [0.34144279, 0.94630077]]])
 print("reshape:" + str(image2vector(np_matrix)))
+
