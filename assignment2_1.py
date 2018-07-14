@@ -67,7 +67,6 @@ np_matrix = np.array([[[0.67826139, 0.29380381],
 print("reshape:" + str(image2vector(np_matrix)))
 
 
-#
 def normalize_rows(x):
     """
     归一化 矩阵的各个元素除以模
