@@ -44,6 +44,35 @@ for i in range(W.shape[0]):
 toc = time.process_time()
 print("gdot=" + str(gdot) + "\n -----------Gdot Computation time :" + str(1000*(toc-tic)) + "ms-----------")
 
+for i in range(10):
+    for j in range(160):
+        print("*", end="")
+    print("")
+
+# Vectorized dot product #
+tic = time.process_time()
+dot = np.dot(x1, x2)
+toc = time.process_time()
+print("dot=" + str(dot) + "\n -----------Dot Computation time :" + str(1000*(toc-tic)) + "ms-----------")
+
+# Vectorized outer product #
+tic = time.process_time()
+outer = np.outer(x1, x2)
+toc = time.process_time()
+print("outer=" + str(outer) + "\n -----------Outer Computation time :" + str(1000*(toc-tic)) + "ms-----------")
+
+# Vectorized elementwise implementation #
+tic = time.process_time()
+mul = np.multiply(x1, x2)
+toc = time.process_time()
+print("elementwise multiply=" + str(mul) + "\n -----------Element multiply Computation time :" + str(1000*(toc-tic))
+      + "ms-----------")
+
+# Vectorized general dot product(?) implementation #
+tic = time.process_time()
+gdot = np.dot(W, x1)
+toc = time.process_time()
+print("gdot=" + str(gdot) + "\n -----------Gdot Computation time :" + str(1000*(toc-tic)) + "ms-----------")
 """
     ---------------------vectorization end---------------------
 """
