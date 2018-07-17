@@ -105,3 +105,38 @@ np_array2 = np.array([[9, 2, 5, 0, 0],
                       [7, 5, 0, 0, 0]])
 print("softMax:" + str(softmax(np_array2)))
 
+
+def L1(yhat, y):
+    """
+    Implement the L1 loss function
+    :param yhat: predicted labels
+    :param y: true labels
+    :return: the value of L1 loss function
+    """
+    loss = np.sum(np.abs(y - yhat))
+    return loss
+
+
+yhat_1 = np.array([.9, 0.2, 0.1, .4, .9])
+y_1 = np.array([1, 0, 0, 1, 1])
+print("L1 loss function = " + str(L1(yhat_1, y_1)))
+
+
+def L2(yhat, y):
+    """
+    Implement the L2 loss function
+    :param yhat: predicted labels
+    :param y: true labels
+    :return: the value of L2 loss function
+    """
+    # loss = np.sum((y - yhat)*(y - yhat))
+    # loss = np.sum(np.square(y - yhat))
+
+    # vectorization
+    loss = np.dot((y - yhat), (y - yhat).T)
+    return loss
+
+
+yhat_2 = np.array([.9, 0.2, 0.1, .4, .9])
+y_2 = np.array([1, 0, 0, 1, 1])
+print("L2 loss function = " + str(L2(yhat_2, y_2)))
