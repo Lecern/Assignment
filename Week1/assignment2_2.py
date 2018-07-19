@@ -104,6 +104,8 @@ def propagate(w, b, X, Y):
     # FROM X to cost
     A = sigmoid(np.dot(w.T, X) + b)  # compute activation
     cost = -1 / m * np.sum(Y * np.log(A) + (1 - Y) * np.log(1 - A))  # compute cost
+
+    # backward propagation(to find grad)
     dw = 1 / m * np.dot(X, (A - Y).T)
     db = 1 / m * np.sum(A - Y)
 
@@ -121,3 +123,55 @@ grads, cost = propagate(w, b, X, Y)
 print("dw = " + str(grads['dw']))
 print("db = " + str(grads['db']))
 print("cost =" + str(cost))
+
+
+def optimize(w, b, X, Y, number_iterations, learning_rate, print_cost = False):
+    """
+    The function optimizes w and b by running a gradient descent algorithm
+    :param w: weights, a numpy array of size(num_px * num_px * 3, 1)
+    :param b: bias, a scalar
+    :param X: date of shape(num_px * num_px * 3, number of examples)
+    :param Y: true "label" vectors(containing 0 if non-cat, 1 if cat) of shape(1, number of examples)
+    :param number_iterations: number of iteration of the optimization loop
+    :param learning_rate: learning rate of the gradient descent update rule
+    :param print_cost: True to print the loss every 100 steps
+    :return: params: dictionary containing the weights w and bias b
+             grads: dictionary containing the gradient of the weights and bias with respect to the cost function
+             costs: list of all the costs computed during optimization, this will be used to plot the curve
+
+     Tips:
+        1) Calculate the cost and the gradient for the current parameters. Use propagate() function.
+        2) Update the parameters using gradient descent rule for w and b.
+    """
+    costs = []
+    for i in range(number_iterations):
+        # cost and gradient calculation
+        grads, cost = propagate(w, b, X, Y)
+
+        # retrieve derivatives from goals
+        dw = grads['dw']
+        db = grads['db']
+
+        # update rule
+        w = w - learning_rate * dw
+        b = b - learning_rate * db
+
+        # record cost
+        if i % 100 == 0:
+            costs.append(cost)
+
+        # print costs every 100 training examples
+        if print_cost and i % 100 == 0:
+            print("Cost after iteration %i: %f" % (i, cost))
+
+    params = {'w': w, 'b': b}
+    grads = {'dw': dw, 'db': db}
+    return params, grads, costs
+
+
+params, grads, costs = optimize(w, b, X, Y, number_iterations=101, learning_rate=0.009, print_cost=False)
+print("w= " + str(params['w']))
+print("b= " + str(params['b']))
+print("dw= " + str(grads['dw']))
+print("db= " + str(grads['db']))
+print("costs= " + str(costs))
