@@ -118,7 +118,8 @@ def propagate(w, b, X, Y):
     return grads, cost
 
 
-w, b, X, Y = np.array([[1], [2]]), 2, np.array([[1, 2], [3, 4]]), np.array([[1, 0]])  # 这里w为2*1 X为2*2 Y为1*2
+# 这里w为3*1 X为4*2 Y为1*2
+w, b, X, Y = np.array([[1], [2], [3]]), 2, np.array([[1, 2], [3, 4], [5, 6]]), np.array([[1, 0]])
 grads, cost = propagate(w, b, X, Y)
 print("dw = " + str(grads['dw']))
 print("db = " + str(grads['db']))
@@ -175,3 +176,120 @@ print("b= " + str(params['b']))
 print("dw= " + str(grads['dw']))
 print("db= " + str(grads['db']))
 print("costs= " + str(costs))
+
+
+def predict(w, b, X):
+    """
+    Predict whether the label is 0 or 1 using learned logistic regression parameters(w, b)
+    :param w: weights, a numpy array of size(num_px * num_px * 3, 1)
+    :param b: bias, a scalar
+    :param X: data of size(num_px * num_px * 3, number of examples)
+    :return Y_prediction: a numpy array(vector) containing all predictions(0/1) from the examples in X
+    """
+    m = X.shape[1]
+    Y_prediction = np.zeros((1, m))
+    w = w.reshape(X.shape[0], 1)
+
+    # Compute the vector "A" predicting probabilities of a cat being present in the picture
+    A = sigmoid(np.dot(w.T, X) + b)
+    for i in range(A.shape[1]):
+        # Convert probabilities A[0, i] to actual predictions p[0, i]
+        if (A[0, i]) < 0.5:
+            Y_prediction[0, i] = 0
+        else:
+            Y_prediction[0, i] = 1
+    assert (Y_prediction.shape == (1,m))
+    return Y_prediction
+
+
+print("Prediction= " + str(predict(w, b, X)))
+"""
+    What to remember
+    -Initialize (w, b)
+    -Optimize the loss iteratively to learn parameters(w, b):
+        -computing the cost and its gradient
+        -updating the parameters using gradient descent
+    -Use the learned(w, b) to predict the labels for a given set of examples 
+"""
+
+
+def model(X_train, Y_train, X_test, Y_test, num_iterations=200, learning_rate=0.5, print_cost=False):
+    """
+    Build the logistic regression model by calling the functions you've implemented previously
+    :param X_train: training set represented by a numpy array of shape(num_px * num_px * 3, m_train)
+    :param Y_train: training labels represented by a numpy array of shape(1, m_train)
+    :param X_test: test set represented by a numpy array of shape(num_px * num_px * 3, m_train)
+    :param Y_test: test labels represented by a numpy array of shape(1, m_train)
+    :param num_iterations: hyperparameter representing the number of iterations to optimize the parameters
+    :param learning_rate: hyperparameter representing the learning rate used in the update rule of optimize()
+    :param print_cost: Set to true print the cost evert 100 iteration
+    :return d: dictionary containing information about the model
+    """
+    # Initialize parameters with zeros
+    w,b = initialize_with_zeros(X_train.shape[0])
+
+    # Gradient descent
+    params, grads, cost= optimize(w, b, X_train, Y_train, num_iterations, learning_rate, print_cost)
+
+    # Retrieve parameters w and b from dictionary "parameters"
+    w = params['w']
+    b = params['b']
+
+    # Predict test/train set examples
+    Y_prediction_test = predict(w, b, X_test)
+    Y_prediction_train = predict(w, b, X_train)
+
+    # Print test/train error
+    print("test accuracy: {}%".format(100 - np.mean(np.abs(Y_prediction_test - Y_test)) * 100))
+    print("train accuracy: {}%".format(100 - np.mean(np.abs(Y_prediction_train - Y_train)) * 100))
+
+    d = {
+        "cost": cost,
+        "Y_prediction_test": Y_prediction_test,
+        "Y_prediction_train": Y_prediction_train,
+        "w": w,
+        "b": b,
+        "learning_rate": learning_rate,
+        "num_iteration": num_iterations
+    }
+    return d
+
+
+d = model(train_set_x, train_set_y, test_set_x, test_set_y, num_iterations=2000, learning_rate=0.005, print_cost=True)
+
+
+index = 1
+plt.imshow(test_set_x[:, index].reshape((num_px, num_px, 3)))
+plt.show()
+print("y= " + str(test_set_y[0, index]) + " your predicted that it is a \"" +
+      classes[int(d["Y_prediction_test"][0, index])].decode("utf-8") + "\" picture")
+
+
+# Plot learning curve(with costs)
+costs = np.squeeze(d['cost'])
+plt.plot(costs)
+plt.ylabel('cost')
+plt.xlabel('iteration (per hundreds)')
+plt.title('Learning rate:' + str(d["learning_rate"]))
+plt.show()
+
+
+# Choice of learning rate
+learning_rates = [0.01, 0.001, 0.0001]
+models = {}
+for i in learning_rates:
+    print("Learning rate is " + str(i))
+    models[str(i)] = model(train_set_x, train_set_y, test_set_x, test_set_y, num_iterations=2000,
+          learning_rate=i, print_cost=True)
+    print ('\n' + "-------------------------------------------------------" + '\n')
+
+for i in learning_rates:
+    plt.plot(np.squeeze(models[str(i)]["cost"]), label= str(models[str(i)]["learning_rate"]))
+
+plt.ylabel("cost")
+plt.xlabel("iterations")
+
+legend = plt.legend(loc='upper center', shadow=True)
+frame = legend.get_frame()
+frame.set_facecolor('0.90')
+plt.show()
