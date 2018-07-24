@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import scipy
 from PIL import Image
 from scipy import ndimage
-from Week1.lr_utils import load_dataset
+from Week2.lr_utils import load_dataset
 MAX_PIXEL = 255
 
 
