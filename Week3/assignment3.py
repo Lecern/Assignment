@@ -134,3 +134,34 @@ X_access, parameters = forward_propagation_test_case()
 A2, cache = forward_propagation(X_access, parameters)
 # Note: we use the mean here just to make sure that your output matches ours.
 print(np.mean(cache["Z1"]), np.mean(cache["A1"]), np.mean(cache["Z2"]), np.mean(cache["A2"]))
+
+
+def compute_costs(A2, Y, parameters):
+    """
+    Computes the cross-entropy cost given in equation (13)
+
+    Arguments:
+    A2 -- The sigmoid output of the second activation, of shape (1, number of examples)
+    Y -- "true" labels vector of shape (1, number of examples)
+    parameters -- python dictionary containing your parameters W1, b1, W2 and b2
+
+    Returns:
+    cost -- cross-entropy cost given equation (13)
+    """
+    m = Y.shape[1]
+    logprobs = np.multiply(np.log(A2), Y) + np.multiply(np.log(1 - A2), (1 - Y))
+    cost = -1 / m * np.sum(logprobs)
+
+    # use the np.dot and the type of cost is np.array
+    # logprobs = np.dot(np.log(A2), Y.T) + np.dot(np.log(1 - A2), (1 - Y.T))
+    # cost = -1 / m * logprobs
+    cost = np.squeeze(cost)
+    assert (isinstance(cost, float))
+    return cost
+
+
+A2, Y_access, parameters = compute_cost_test_case()
+cost = compute_costs(A2, Y_access, parameters)
+print("cost= " + str(cost))
+print(type(cost))
+
