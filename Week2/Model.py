@@ -16,7 +16,8 @@ print(m_train)
 print(m_test)
 print(num_px)
 
-train_set_x_flatten = train_set_x.reshape(train_set_x.shape[0], num_px * num_px * 3).T
+# train_set_x_flatten = train_set_x.reshape(train_set_x.shape[0], num_px * num_px * 3).T
+train_set_x_flatten = train_set_x.reshape(num_px * num_px * 3, train_set_x.shape[0])
 test_set_x_flatten = test_set_x.reshape(test_set_x.shape[0], num_px * num_px * 3).T
 train_set_x = train_set_x_flatten / 255
 test_set_x = test_set_x_flatten / 255
@@ -31,6 +32,13 @@ def initialize_with_zeros(dim):
     w = np.zeros((dim, 1))
     b = 0
     return w, b
+
+
+dim = 2
+w, b = initialize_with_zeros(dim)
+print(w)
+print(w.shape)
+
 
 
 def propagate(w, b, X, Y):
