@@ -165,3 +165,17 @@ cost = compute_costs(A2, Y_access, parameters)
 print("cost= " + str(cost))
 print(type(cost))
 
+
+def backward_propagation(paramaters, cache, X, Y):
+    m = X.shape[1]
+    # First, retrieve W1 and W2 from the dictionary "parameters"
+    W1 = parameters["W1"]
+    W2 = parameters["W2"]
+    # Retrieve also A1 and A2 from the dictionary "cahce"
+    A1 = cache["A1"]
+    A2 = cache["A2"]
+
+    # Backward propagation: calculate dW1, db1, dW2, db2
+    dZ2 = np.subtract(A2, Y)
+    dW2 = 1 / m * np.dot(dZ2, A1.T)
+    db2 = 1 / m * np.sum(dZ2, axis=1, keepdims=True)

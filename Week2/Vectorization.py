@@ -61,7 +61,7 @@ outer = np.outer(x1, x2)
 toc = time.process_time()
 print("outer=" + str(outer) + "\n -----------Outer Computation time :" + str(1000*(toc-tic)) + "ms-----------")
 
-# Vectorized elementwise implementation #
+# Vectorized element wise implementation #
 tic = time.process_time()
 mul = np.multiply(x1, x2)
 toc = time.process_time()
