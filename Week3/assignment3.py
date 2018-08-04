@@ -166,7 +166,7 @@ print("cost= " + str(cost))
 print(type(cost))
 
 
-def backward_propagation(paramaters, cache, X, Y):
+def backward_propagation(parameters, cache, X, Y):
     m = X.shape[1]
     # First, retrieve W1 and W2 from the dictionary "parameters"
     W1 = parameters["W1"]
