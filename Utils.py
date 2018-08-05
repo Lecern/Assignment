@@ -1,6 +1,5 @@
 import numpy as np
 
-
 x1 = np.array([[1, 2, 3], [4, 5, 6]])  # 2*3
 x2 = np.array([[1, 2], [3, 4], [5, 6]])  # 3*2
 x3 = np.array([[1, 2], [3, 4]])
@@ -14,3 +13,7 @@ print("Dot product =" + str(dot))
 print("Element wise product=" + str(mul))
 print(str(np.sum(mul)))
 print("dot2 = " + str(dot2))
+
+hidden_layer_sizes = [1, 2, 3, 4, 5, 20, 50]
+e = enumerate(hidden_layer_sizes)
+
