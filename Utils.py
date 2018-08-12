@@ -17,3 +17,5 @@ print("dot2 = " + str(dot2))
 hidden_layer_sizes = [1, 2, 3, 4, 5, 20, 50]
 e = enumerate(hidden_layer_sizes)
 
+x5 = np.array([[2]])
+print(x5.shape)
