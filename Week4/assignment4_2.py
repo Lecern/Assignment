@@ -204,3 +204,17 @@ parameters = L_layer_model(train_x, train_y, layers_dims, learning_rate=0.0075, 
 predict_train = predict(train_x, train_y, parameters)
 predict_test = predict(test_x, test_y, parameters)
 
+# print_mislabeled_images(classes, test_x, test_y, predict_test)
+
+my_image = "dog.jpg"
+my_label_y = [0]
+
+fname = "images_2/" + my_image
+image = np.array(ndimage.imread(fname, flatten=False))
+my_image = scipy.misc.imresize(image, size=(num_px, num_px)).reshape((num_px * num_px * 3, 1))
+my_predicted_image = predict(my_image, my_label_y, parameters)
+
+plt.imshow(image)
+plt.show()
+print("y = " + str(np.squeeze(my_predicted_image)) + ", your L-layer model predicts a \"" + classes[
+    int(np.squeeze(my_predicted_image)), ].decode("utf-8") + "\" picture.")
