@@ -19,3 +19,10 @@ e = enumerate(hidden_layer_sizes)
 
 x5 = np.array([[2]])
 print(x5.shape)
+
+print(20 | 36)
+print(30 & 45)
+print(48 ^ 77)
+
+a = np.random.rand(3, 10, 4)
+print(a)
