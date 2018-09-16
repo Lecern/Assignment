@@ -176,7 +176,7 @@ def optimize(X, Y, a_prev, parameters, vocab_size, learning_rate=0.01):
 
 
 np.random.seed(1)
-vocab_size, n_a = 27, 100
+vocab_size, n_a = 53, 100
 a_prev = np.random.randn(n_a, 1)
 Wax, Waa, Wya = np.random.randn(n_a, vocab_size), np.random.randn(n_a, n_a), np.random.randn(vocab_size, n_a)
 b, by = np.random.randn(n_a, 1), np.random.randn(vocab_size, 1)
@@ -184,7 +184,7 @@ parameters = {"Wax": Wax, "Waa": Waa, "Wya": Wya, "b": b, "by": by}
 X = [12, 3, 5, 11, 22, 3]
 Y = [4, 14, 11, 22, 25, 26]
 
-loss, gradients, a_last = optimize(X, Y, a_prev, parameters, vocab_size=27, learning_rate=0.01)
+loss, gradients, a_last = optimize(X, Y, a_prev, parameters, vocab_size=53, learning_rate=0.01)
 print("Loss =", loss)
 print("gradients[\"dWaa\"][1][2] =", gradients["dWaa"][1][2])
 print("np.argmax(gradients[\"dWax\"]) =", np.argmax(gradients["dWax"]))
@@ -195,7 +195,9 @@ print("a_last[4] =", a_last[4])
 print("=====================================================================================================")
 
 
-def model(data, ix_to_char, char_to_ix, num_iteration=35000, n_a=50, dino_names=7, vocab_size=27):
+# *****这里的vocab_size如果按照assignment的27来设置的话会报错,原因是作为存储字母元素的数量,不应该是27(26+UNKNOWN),而是53(26Capital+26Lower+UNKNOWN)
+# *****本assignment所涉及的所有vocab_size都按53来算
+def model(data, ix_to_char, char_to_ix, num_iteration=35000, n_a=50, dino_names=7, vocab_size=53):
     """
     Trains the model and generates dinosaur names.
 
@@ -226,7 +228,7 @@ def model(data, ix_to_char, char_to_ix, num_iteration=35000, n_a=50, dino_names=
     examples = [x.lower().strip() for x in examples]
 
     # Shuffle list of all dinasour names
-    np.random.seed(3)
+    np.random.seed(0)
     np.random.shuffle(examples)
 
     # Initialize the hidden state of your LSTM
