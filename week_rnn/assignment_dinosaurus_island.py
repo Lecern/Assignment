@@ -11,7 +11,7 @@ chars = list(set(data))
 data_size, vocab_size = len(data), len(chars)
 print('There are %d total characters and %d unique characters in your data.' % (data_size, vocab_size))
 
-chat_to_ix = {ch: i for i, ch in enumerate(sorted(chars))}
+char_to_ix = {ch: i for i, ch in enumerate(sorted(chars))}
 ix_to_char = {i: ch for i, ch in enumerate(sorted(chars))}
 print(ix_to_char)
 
@@ -128,13 +128,13 @@ Wax, Waa, Wya = np.random.randn(n_a, vocab_size), np.random.randn(n_a, n_a), np.
 b, by = np.random.randn(n_a, 1), np.random.randn(vocab_size, 1)
 parameters = {"Wax": Wax, "Waa": Waa, "Wya": Wya, "b": b, "by": by}
 
-indices = sample(parameters, chat_to_ix, 0)
+indices = sample(parameters, char_to_ix, 0)
 print("Sampling:")
 print("list of sampled indices:", indices)
 print("list of sampled characters:", [ix_to_char[i] for i in indices])
 
 
-def optimize(X, Y, a_prev, parameters, learning_rate=0.01):
+def optimize(X, Y, a_prev, parameters, vocab_size, learning_rate=0.01):
     """
     Execute one step of the optimization to train the model.
 
@@ -161,7 +161,7 @@ def optimize(X, Y, a_prev, parameters, learning_rate=0.01):
     a[len(X)-1] -- the last hidden state, of shape (n_a, 1)
     """
     # Forward propagation through time
-    loss, cache = rnn_forward(X, Y, a_prev, parameters, vocab_size=71)
+    loss, cache = rnn_forward(X, Y, a_prev, parameters, vocab_size)
 
     # Backward propagation through time
     gradients, a = rnn_backward(X, Y, parameters, cache)
@@ -177,14 +177,14 @@ def optimize(X, Y, a_prev, parameters, learning_rate=0.01):
 
 np.random.seed(1)
 vocab_size, n_a = 27, 100
-a_prev = np.random.rand(n_a, 1)
+a_prev = np.random.randn(n_a, 1)
 Wax, Waa, Wya = np.random.randn(n_a, vocab_size), np.random.randn(n_a, n_a), np.random.randn(vocab_size, n_a)
-b, by = np.random.rand(n_a, 1), np.random.rand(vocab_size, 1)
+b, by = np.random.randn(n_a, 1), np.random.randn(vocab_size, 1)
 parameters = {"Wax": Wax, "Waa": Waa, "Wya": Wya, "b": b, "by": by}
 X = [12, 3, 5, 11, 22, 3]
 Y = [4, 14, 11, 22, 25, 26]
 
-loss, gradients, a_last = optimize(X, Y, a_prev, parameters, learning_rate=0.01)
+loss, gradients, a_last = optimize(X, Y, a_prev, parameters, vocab_size=27, learning_rate=0.01)
 print("Loss =", loss)
 print("gradients[\"dWaa\"][1][2] =", gradients["dWaa"][1][2])
 print("np.argmax(gradients[\"dWax\"]) =", np.argmax(gradients["dWax"]))
@@ -192,3 +192,75 @@ print("gradients[\"dWya\"][1][2] =", gradients["dWya"][1][2])
 print("gradients[\"db\"][4] =", gradients["db"][4])
 print("gradients[\"dby\"][1] =", gradients["dby"][1])
 print("a_last[4] =", a_last[4])
+print("=====================================================================================================")
+
+
+def model(data, ix_to_char, char_to_ix, num_iteration=35000, n_a=50, dino_names=7, vocab_size=27):
+    """
+    Trains the model and generates dinosaur names.
+
+    Arguments:
+    data -- text corpus
+    ix_to_char -- dictionary that maps the index to a character
+    char_to_ix -- dictionary that maps a character to an index
+    num_iterations -- number of iterations to train the model for
+    n_a -- number of units of the RNN cell
+    dino_names -- number of dinosaur names you want to sample at each iteration.
+    vocab_size -- number of unique characters found in the text, size of the vocabulary
+
+    Returns:
+    parameters -- learned parameters
+    """
+    # Retrieve n_x and n_y from vocab_size
+    n_x, n_y = vocab_size, vocab_size
+
+    # Initialize parameters
+    parameters = initialize_parameters(n_a, n_x, n_y)
+
+    # Initialize loss
+    loss = get_initial_loss(vocab_size, dino_names)
+
+    # Build list of all dinosaur names (training examples)
+    with open("dinos.txt") as f:
+        examples = f.readlines()
+    examples = [x.lower().strip() for x in examples]
+
+    # Shuffle list of all dinasour names
+    np.random.seed(3)
+    np.random.shuffle(examples)
+
+    # Initialize the hidden state of your LSTM
+    a_prev = np.zeros((n_a, 1))
+
+    # Optimization loop
+    for j in range(num_iteration):
+        # Define one training example
+        index = j % len(examples)
+        X = [None] + [char_to_ix[ch] for ch in examples[index]]
+        Y = X[1:] + [char_to_ix["\n"]]
+
+        # Perform one optimization step: Forward-prop->Backward-prop->Clip->Update parameters
+        # Choose a learning rate of 0.01
+        curr_loss, gradients, a_prev = optimize(X, Y, a_prev, parameters, vocab_size, learning_rate=0.01)
+
+        # Use a latency trick to keep the loss smooth. It happens here to accelerate the training.
+        loss = smooth(loss, curr_loss)
+
+        # Every 2000 iteration, generate "n" character thanks to sample() to check if the model is learning properly
+        if j % 2000 == 0:
+            print("Iteration: %d, Loss: %f" % (j, loss) + '\n')
+
+            # The number of dinosaur to print
+            seed = 0
+            for name in range(dino_names):
+                # Sample indics and print them
+                sampled_indices = sample(parameters, char_to_ix, seed)
+                print_sample(sampled_indices, ix_to_char)
+                seed += 1  # To get the same result for grading purposed, increment the seed by one.
+
+            print("\n")
+
+    return parameters
+
+
+model(data, ix_to_char, char_to_ix)
