@@ -12,7 +12,8 @@ def smooth(loss, cur_loss):
 
 def print_sample(sample_ix, ix_to_char):
     txt = ''.join(ix_to_char[ix] for ix in sample_ix)
-    print('----\n %s \n----' % (txt,))
+    txt = txt[0].upper() + txt[1:]  # capitalize first character
+    print('%s' % (txt,), end='')
 
 
 def get_initial_loss(vocab_size, seq_length):
@@ -27,7 +28,7 @@ def softmax(x):
 def initialize_parameters(n_a, n_x, n_y):
     """
     Initialize parameters with small random values
-    
+
     Returns:
     parameters -- python dictionary containing:
                         Wax -- Weight matrix multiplying the input, numpy array of shape (n_a, n_x)
@@ -78,7 +79,7 @@ def update_parameters(parameters, gradients, lr):
     return parameters
 
 
-def rnn_forward(X, Y, a0, parameters, vocab_size=71):
+def rnn_forward(X, Y, a0, parameters, vocab_size=27):
     # Initialize x, a and y_hat as empty dictionaries
     x, a, y_hat = {}, {}, {}
 
@@ -88,9 +89,12 @@ def rnn_forward(X, Y, a0, parameters, vocab_size=71):
     loss = 0
 
     for t in range(len(X)):
+
         # Set x[t] to be the one-hot vector representation of the t'th character in X.
+        # if X[t] == None, we just have x[t]=0. This is used to set the input for the first timestep to the zero vector.
         x[t] = np.zeros((vocab_size, 1))
-        x[t][X[t]] = 1
+        if (X[t] != None):
+            x[t][X[t]] = 1
 
         # Run one step forward of the RNN
         a[t], y_hat[t] = rnn_step_forward(parameters, a[t - 1], x[t])
